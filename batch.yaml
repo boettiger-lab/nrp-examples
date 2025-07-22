@@ -9,13 +9,28 @@ spec:
       - name: demo
         image: gitlab-registry.nrp-nautilus.io/prp/jupyter-stack/prp
         command:
-        - "python"
+        - "bash"
+        - "-c"
         args:
-        - "/opt/repo/nrp-examples/hello_world.py"
-        - "nrp-batch-job"
+        - "pip install -r /opt/repo/nrp-examples/requirements.txt && python /opt/repo/nrp-examples/s3_list_bucket.py"
         volumeMounts:
         - name: git-repo
           mountPath: /opt/repo
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-credentials
+              key: access-key-id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws-credentials
+              key: secret-access-key
+        - name: AWS_S3_ENDPOINT
+          value: "minio.carlboettiger.info"
+        - name: S3_BUCKET_NAME
+          value: "public-ca30x30"
         resources:
           limits:
             memory: 1Gi
